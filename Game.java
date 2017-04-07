@@ -4,8 +4,8 @@ import java.util.Arrays;
 public class Game
 {
   Scanner input = new Scanner(System.in);
-  public static char[][] boardFG = new char[5][5]; 
-  public static char[][] boardBG= new char[5][5]; 
+  public static char[][] boardFG = new char[5][5]; // foreground, will be displayed to other player
+  public static char[][] boardBG= new char[5][5]; // background grid, will hold ships
 
   Game()
   {
@@ -19,6 +19,20 @@ public class Game
       }
     }
   }
+
+  public bool isEmpty()
+  {
+    for(int i=0;i<5;i++)
+    {
+      for(int j=0;j<5;j++)
+      {
+        if(boardFG[i][j] == 'O')
+          return false;
+      }
+    }
+    return true;
+  }
+
   public void printBoard()
   {
     System.out.println("  A  B  C  D  E");
@@ -32,6 +46,7 @@ public class Game
       System.out.println("");
     }
   }
+
   public void setBoard()
   {
     for(int i = 0;i<3;i++)
@@ -42,11 +57,40 @@ public class Game
       {
         int row = getRow(ship);
         int col = getColumn(ship);
+        //System.out.println("neighbors:" + neighbors);
         boardBG[row-1][col] = 'O';
+        int neighbors = otherCoords(row-1,col);
+        ship = input.nextLine();
+        if(checkInput(ship))
+        {
+          row = getRow(ship);
+          col = getColumn(ship);
+          //System.out.println("neighbors:" + neighbors);
+          boardBG[row-1][col] = 'O';
+        }
       }
       else
-        System.out.println("here");
+        System.out.println("something went wrong with setBoard()");
     }
+  }
+
+  public void move()
+  {
+    System.out.println("Enter the coordinates you want to hit (eg:A2)");
+    String ship = input.nextLine();
+      if(checkInput(ship))
+      {
+        int row = getRow(ship);
+        int col = getColumn(ship);
+        // send row-1 and col to server to hit
+      }
+      else
+        System.out.println("something went wrong with move()");
+  }
+
+  public void oppMove() // get opponent's row and column 
+  {
+    // check opp's coords and see if hit or miss from Background grid
   }
 
   public int getColumn(String coords)
@@ -90,7 +134,6 @@ public class Game
     return true;
   }
 
-
   public boolean findItem(String[] arr,String val)
   {
     for(int i = 0;i<arr.length;i++)
@@ -101,58 +144,82 @@ public class Game
     return false;
   }
 
-  public int otherCoords(int row, int col) // check corners, then sides, then remaining
+  public String getAlpha(int c)
   {
-    if (row == 0 && col == 0)
+    String[] alpha = {"A","B","C","D","E"};
+    return alpha[c];
+  }
+
+  public int otherCoords(int row, int col)
+  { 
+    // check corners, then sides, then remaining
+    System.out.println("Here are some suggestions for the other part of the ship.\nPick a coordinate");
+    //System.out.println("row:" + row +" col:"+ col);
+    if (row == 0 && col == 0) // top left corner
     {
-      System.out.println("1)" + Integer.toString(row+1) + "," + Integer.toString(col));
-      System.out.println("2)" + Integer.toString(row) + "," + Integer.toString(col+1));
+      System.out.println("1) " + getAlpha(col) + Integer.toString(row+1+1));
+      System.out.println("2) " + getAlpha(col+1) + Integer.toString(row+1));
       return 2;
     }
 
-    if (row == 4 && col == 4)
+    if (row == 4 && col == 4) // bottom right corner
     {
-      System.out.println("1)" + Integer.toString(row-1) + "," + Integer.toString(col));
-      System.out.println("2)" + Integer.toString(row) + "," + Integer.toString(col-1));
+      System.out.println("1)" + getAlpha(col) + Integer.toString(row-1+1));
+      System.out.println("2)" + getAlpha(col-1) + Integer.toString(row+1));
       return 2;
     }
 
-    if (row == 0 && col == 4)
+    if (row == 0 && col == 4) // bottom left corner
     {
-      System.out.println("1)" + Integer.toString(row+1) + "," + Integer.toString(col));
-      System.out.println("2)" + Integer.toString(row) + "," + Integer.toString(col-1));
+      System.out.println("1)" + getAlpha(col) + Integer.toString(row+1+1));
+      System.out.println("2)" + getAlpha(col-1) + Integer.toString(row+1));
       return 2;
     }
 
-    if (row == 4 && col == 0)
+    if (row == 4 && col == 0) // bottom right corner
     {
-      System.out.println("1)" + Integer.toString(row-1) + "," + Integer.toString(col));
-      System.out.println("2)" + Integer.toString(row) + "," + Integer.toString(col+1));
+      System.out.println("1)" + getAlpha(col) + Integer.toString(row-1+1));
+      System.out.println("2)" + getAlpha(col+1) + Integer.toString(row+1));
       return 2;
     }
 
-    if(row == 4)
+    if(row == 4) // bottom row
     {
-      System.out.println("1)" + Integer.toString(row) + "," + Integer.toString(col+1));
-      System.out.println("2)" + Integer.toString(row) + "," + Integer.toString(col-1));
-      System.out.println("3)" + Integer.toString(row-1) + "," + Integer.toString(col));
+      System.out.println("1)" + getAlpha(col+1) + Integer.toString(row+1));
+      System.out.println("2)" + getAlpha(col-1) + Integer.toString(row+1));
+      System.out.println("3)" + getAlpha(col) + Integer.toString(row-1+1));
       return 3;
     }
 
-    if(row == 0)
+    if(row == 0) // top row
     {
-      System.out.println("1)" + Integer.toString(row) + "," + Integer.toString(col+1));
-      System.out.println("2)" + Integer.toString(row) + "," + Integer.toString(col-1));
-      System.out.println("3)" + Integer.toString(row-1) + "," + Integer.toString(col));
+      System.out.println("1)" + getAlpha(col+1) + Integer.toString(row+1));
+      System.out.println("2)" + getAlpha(col-1) + Integer.toString(row+1));
+      System.out.println("3)" + getAlpha(col) + Integer.toString(row+1+1));
       return 3;
     }
-    // finish this
 
-    return -1;
+    if(col == 4) // bottom row
+    {
+      System.out.println("1)" + getAlpha(col) + Integer.toString(row+1+1));
+      System.out.println("2)" + getAlpha(col) + Integer.toString(row-1+1));
+      System.out.println("3)" + getAlpha(col-1) + Integer.toString(row+1));
+      return 3;
+    }
 
+    if(col == 0) // top row
+    {
+      System.out.println("1)" + getAlpha(col) + Integer.toString(row+1+1));
+      System.out.println("2)" + getAlpha(col) + Integer.toString(row-1+1));
+      System.out.println("3)" + getAlpha(col+1) + Integer.toString(row+1));
+      return 3;
+    }
+    
+    System.out.println("1)" + getAlpha(col) + Integer.toString(row+1+1));
+    System.out.println("2)" + getAlpha(col) + Integer.toString(row-1+1));
+    System.out.println("3)" + getAlpha(col+1) + Integer.toString(row+1));
+    System.out.println("4)" + getAlpha(col-1) + Integer.toString(row+1));
+    return 4;
   }
 
 }
-
-
-
