@@ -20,7 +20,7 @@ public class Game
     }
   }
 
-  public bool isEmpty()
+  public boolean isEmpty()
   {
     for(int i=0;i<5;i++)
     {
