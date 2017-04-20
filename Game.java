@@ -4,8 +4,13 @@ import java.util.Arrays;
 public class Game
 {
   Scanner input = new Scanner(System.in);
-  public static char[][] boardFG = new char[5][5]; // foreground, will be displayed to other player
-  public static char[][] boardBG= new char[5][5]; // background grid, will hold ships
+  public static char[][] p1Board = new char[5][5]; // foreground, will be displayed to other player
+  public static char[][] p2Board = new char[5][5]; // background grid, will hold ships
+  boolean isP1 = true;
+  boolean p1Connected = false;
+  boolean p2Connected = false;
+  int p1Turns = 0;
+  int p2Turns = 0;
 
   Game()
   {
@@ -14,10 +19,15 @@ public class Game
     {
       for(int j=0;j<5;j++)
       {
-        boardFG[i][j] = '~';
-        boardBG[i][j] = '~';
+        p1Board[i][j] = '~';
+        p1Board[i][j] = '~';
       }
     }
+  }
+
+  public int getTurnCount()
+  {
+    return ((isP1) ? p1Turns : p2Turns);
   }
 
   public boolean isEmpty()
@@ -26,7 +36,7 @@ public class Game
     {
       for(int j=0;j<5;j++)
       {
-        if(boardFG[i][j] == 'O')
+        if(((isP1) ? p1Board[i][j] : p2Board[i][j]) == 'O')
           return false;
       }
     }
@@ -35,42 +45,83 @@ public class Game
 
   public void printBoard()
   {
-    System.out.println("  A  B  C  D  E");
-    for(int i=0;i<5;i++)
-    {
-      System.out.print(Integer.toString(i+1));
-      for(int j=0;j<5;j++)
+    if(isP1)
       {
-        System.out.print(" "+boardBG[i][j] + " ");
+      System.out.println("  A  B  C  D  E");
+      for(int i=0;i<5;i++)
+      {
+        System.out.print(Integer.toString(i+1));
+        for(int j=0;j<5;j++)
+        {
+          System.out.print(" "+p1Board[i][j] + " ");
+        }
+        System.out.println("");
       }
-      System.out.println("");
+    }
+    else
+    {
+      System.out.println("  A  B  C  D  E");
+      for(int i=0;i<5;i++)
+      {
+        System.out.print(Integer.toString(i+1));
+        for(int j=0;j<5;j++)
+        {
+          System.out.print(" "+p2Board[i][j] + " ");
+        }
+        System.out.println("");
+      }
     }
   }
 
   public void setBoard()
-  {
-    for(int i = 0;i<3;i++)
+  { 
+    if(isP1)
     {
-      System.out.println("Enter the coordinates for the origin of the ship (eg:A2)"); 
-      String ship = input.nextLine();
-      if(checkInput(ship))
+      for(int i = 0;i<3;i++)
       {
-        int row = getRow(ship);
-        int col = getColumn(ship);
-        //System.out.println("neighbors:" + neighbors);
-        boardBG[row-1][col] = 'O';
-        int neighbors = otherCoords(row-1,col);
-        ship = input.nextLine();
+        System.out.println("Enter the coordinates for the origin of the ship (eg:A2)"); 
+        String ship = input.nextLine();
         if(checkInput(ship))
         {
-          row = getRow(ship);
-          col = getColumn(ship);
-          //System.out.println("neighbors:" + neighbors);
-          boardBG[row-1][col] = 'O';
+          int row = getRow(ship);
+          int col = getColumn(ship);
+          p1Board[row-1][col] = 'O';
+          int neighbors = otherCoords(row-1,col);
+          ship = input.nextLine();
+          if(checkInput(ship))
+          {
+            row = getRow(ship);
+            col = getColumn(ship);
+            p1Board[row-1][col] = 'O';
+          }
         }
+        else
+          System.out.println("something went wrong with setBoard()");
       }
-      else
-        System.out.println("something went wrong with setBoard()");
+    }
+    else
+    {
+      for(int i = 0;i<3;i++)
+      {
+        System.out.println("Enter the coordinates for the origin of the ship (eg:A2)"); 
+        String ship = input.nextLine();
+        if(checkInput(ship))
+        {
+          int row = getRow(ship);
+          int col = getColumn(ship);
+          p2Board[row-1][col] = 'O';
+          int neighbors = otherCoords(row-1,col);
+          ship = input.nextLine();
+          if(checkInput(ship))
+          {
+            row = getRow(ship);
+            col = getColumn(ship);
+            p2Board[row-1][col] = 'O';
+          }
+        }
+        else
+          System.out.println("something went wrong with setBoard()");
+      }
     }
   }
 
@@ -82,15 +133,10 @@ public class Game
       {
         int row = getRow(ship);
         int col = getColumn(ship);
-        // send row-1 and col to server to hit
+        // incomplete function
       }
       else
         System.out.println("something went wrong with move()");
-  }
-
-  public void oppMove() // get opponent's row and column 
-  {
-    // check opp's coords and see if hit or miss from Background grid
   }
 
   public int getColumn(String coords)
