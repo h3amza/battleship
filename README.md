@@ -1,6 +1,6 @@
 # battleship
 ###### Implementation of the game of Battleship played by 2 players over a network
-# only compiles for now, does not run
+###### only compiles for now, does not run
 Running current code on a single computer:
 Run the following on terminal:
 ```sh
