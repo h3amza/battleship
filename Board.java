@@ -6,6 +6,7 @@ public class Board
 
 	public Board(int width, int height)
 	{
+		this.coordinates = new char[width][height];
 		this.width = width;
 		this.height = height;
 		for(int i=0;i<5;i++)
@@ -38,7 +39,16 @@ public class Board
 
 	public void attack(int row,int column){}
 
-	public void drawBoard(){}
+	public void drawBoard(){
+		for(char[] row:coordinates)
+		{
+			for(char square:row)
+			{
+				System.out.print(square);
+			}
+			System.out.println();
+		}
+	}
 
 	public boolean isLost()
 	{
