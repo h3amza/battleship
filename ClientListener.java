@@ -1,3 +1,7 @@
+/*
+* obsolete class, no longer in use
+*/
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;

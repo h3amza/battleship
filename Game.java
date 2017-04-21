@@ -1,3 +1,6 @@
+/*
+* obsolete class, no longer in use
+*/
 import java.util.Scanner;
 import java.util.Arrays;
 

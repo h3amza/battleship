@@ -7,11 +7,10 @@ import java.util.ArrayList;
 
 public class Server {
     private ArrayList<Socket> sockets;
-    private Game game;
+    private static final ClientHandler[] handlers = new ClientHandler[2];
 
     Server(){
         sockets = new ArrayList<>();
-        game = new Game();
     }
         private void getConnection()
         {
@@ -27,10 +26,18 @@ public class Server {
                     Socket connectionSock = serverSock.accept();
                     // Add this socket to the list
                     sockets.add(connectionSock);
+                    for (int i = 0; i < 2; i++) 
+                    {
+                        if (handlers[i] == null) 
+                        {
+                            (handlers[i] = new ClientHandler(connectionSock, handlers)).start();
+                            break;
+                        }
+                    }
                     // Send to ClientHandler the socket and arraylist of all sockets
-                    ClientHandler handler = new ClientHandler(connectionSock, this.sockets, game);
-                    Thread theThread = new Thread(handler);
-                    theThread.start();
+                    //ClientHandler handler = new ClientHandler(connectionSock, this.sockets);
+                    //Thread theThread = new Thread(handler);
+                    //theThread.start();
                 }
                 // Will never get here, but if the above loop is given
                 // an exit condition then we'll go ahead and close the socket

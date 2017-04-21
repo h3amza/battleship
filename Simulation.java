@@ -1,4 +1,6 @@
-
+/*
+* obsolete class, no longer in use
+*/
 public class Simulation
 {
   // arguments are passed using the text field below this editor
