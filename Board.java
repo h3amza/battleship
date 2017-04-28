@@ -1,51 +1,116 @@
-public class Board
+public class Board 
 {
-	public char[][] coordinates;
-	public int height,width;
-	public Ship[] ships = new Ship[3];
-
-	public Board(int width, int height)
+	public char[][] Coords;
+	private int height, width;
+	
+	public Board()
 	{
-		this.width = width;
-		this.height = height;
+		this.Coords = new char[5][5];
+		this.width = 5;
+		this.height = 5;
 		for(int i=0;i<5;i++)
 		{
 			for(int j=0;j<5;j++)
 			{
-				coordinates[i][j] = '~';
+				Coords[i][j] = '~';
 			}
 		}
 	}
-
-	public void clear()
+	
+	public boolean isEmpty(int x, int y)
 	{
-		for(int i=0;i<5;i++)
-		{
-			for(int j=0;j<5;j++)
-			{
-				coordinates[i][j] = '~';
-			}
-		}
-		for(int i=0;i<3;i++)
-		{
-			ships[i]=null;
-		}
+		if(Coords[x][y] == '~')
+			return true;
+		else
+			return false;
 	}
 
-	public void isHit(Ship ship){}
-
-	public boolean setShip(Ship ship){return true;}
-
-	public void attack(int row,int column){}
-
-	public void drawBoard(){}
-
-	public boolean isLost()
+	public boolean isOnBounds(Ship ship)
 	{
-		for(int i=0;i<3;i++)
+		if(ship.orientation)
 		{
-			if(ships[i].equals('X'))
+			if((ship.x+ship.length)>5)
 				return false;
+		}
+		else
+		{
+			if((ship.x+ship.length)>5)
+				return false;
+		}
+		if(ship.x>=0 && ship.x<=4 && ship.y>=0 && ship.y<=4)
+			return true;
+		else
+			return false;
+	}
+	public boolean setShip(Ship ship)
+	{
+		if(isOnBounds(ship))
+		{
+			int i;
+			for(i=0;i<ship.length;i++)
+			{
+				if(ship.orientation)
+				{
+					Coords[ship.x][ship.y + i] = 'O';
+				}
+				else
+				{
+					Coords[ship.x + i][ship.y] = 'O';
+				}
+			}
+			return true;	
+		}
+		else
+			return false;
+	}
+	public boolean attack(int x, int y)
+	{
+		if(!(Coords[x][y]=='~'))
+		{
+			if(Coords[x][y] == 'O')
+				Coords[x][y] = 'X';
+			if(Coords[x][y] == '~')
+				Coords[x][y] = '*';
+		}
+		else
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public void printBoard()
+	{
+		System.out.println(" Y 0 1 2 3 4");
+		System.out.println("X");
+		for(int i=0;i<width;i++)
+		{
+			System.out.print((i)+"  ");
+			for(int j=0;j<height;j++)
+			{
+				System.out.print(Coords[i][j]+" ");
+			}
+			System.out.println();
+		}
+	}
+	public void markHit(int X, int Y)
+	{
+		Coords[X][Y] = 'X';
+	}
+	public void markMiss(int X, int Y)
+	{
+		Coords[X][Y] = '*';
+	}
+	
+	public boolean lost()
+	{
+		for(int i=0;i<width;i++)
+		{
+			for(int j=0;j<height;j++)
+			{
+				if(Coords[i][j] == 'O')
+					return false;
+			}
 		}
 		return true;
 	}
