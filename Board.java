@@ -1,3 +1,4 @@
+
 public class Board 
 {
 	public char[][] Coords;
