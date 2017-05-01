@@ -1,3 +1,7 @@
+/*
+* This class defines Server that starts Client handler threads and communicates responses
+*/
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -9,7 +13,7 @@ public class Server
 {
 	public static ServerSocket serverSocket = null;
 	public static Socket clientSocket = null;
-	public static final ClientHandler[] handler = new ClientHandler[2];
+	public static final ClientHandler[] handler = new ClientHandler[2]; // one handler for each player
 	public static final int port = 7654;
 
 
@@ -36,7 +40,7 @@ public class Server
 				{
 					if (handler[i] == null) 
 					{
-						(handler[i] = new ClientHandler(clientSocket, handler)).start();
+						(handler[i] = new ClientHandler(clientSocket, handler)).start(); // create handler and start
 						break;
 					}
 				}	
@@ -48,4 +52,3 @@ public class Server
 		}
 	}
 }
-
