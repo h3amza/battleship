@@ -1,3 +1,7 @@
+/*
+* This class defines ClientHandler to get communicate between server and client
+*/
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -7,6 +11,7 @@ import java.net.ServerSocket;
 
 class ClientHandler extends Thread 
 {
+	// network related objects
 	private String clientName = null;
 	private BufferedReader inputStream = null;
 	private PrintStream outputStream = null;
@@ -21,10 +26,11 @@ class ClientHandler extends Thread
 	    this.handler = handler;
 	}
 	
-	public void win(String from, String to)
+	// send win notification
+	public void win(String from, String to) 
 	{
 		boolean send = false;
-		for (int i = 0; i < 2; i++) 
+		for (int i = 0; i < 2; i++) // only two threads, one for each player
 		{
 			if (handler[i].clientName.equals(to)) 
 			{
@@ -35,13 +41,14 @@ class ClientHandler extends Thread
 		}
 	}
 	
+	// send attack notification
 	public void attack(String from, String to, String Coords)
 	{
 		boolean send = false;
 		
 		for (int i = 0; i < 2; i++) 
 		{
-			if (handler[i].clientName.equals(to)) 
+			if (handler[i].clientName.equals(to)) // check if this player by name
 			{
 			 	handler[i].outputStream.println("--- Attack from User " + from + " on Coordinates " + Coords);
 			 	send = true;
@@ -49,7 +56,8 @@ class ClientHandler extends Thread
 			}
 		}
 	}
-	
+
+	// send hit enemy ship notification
 	public void hitResponse(String from, String to, String Coords)
 	{
 		boolean send = false;
@@ -65,6 +73,7 @@ class ClientHandler extends Thread
 		}
 	}
 	
+	// send miss enemy ship notification
 	public void missResponse(String from, String to, String Coords)
 	{
 		boolean send = false;
@@ -80,6 +89,7 @@ class ClientHandler extends Thread
 		}
 	}
 	
+	// send game setup notification
 	public void game(String from, String to)
 	{
 		boolean send = false;
@@ -100,6 +110,7 @@ class ClientHandler extends Thread
 		}
 	}
 	
+	// send game beginning notification
 	public void setup(String from, String to)
 	{
 		boolean send = false;
@@ -114,6 +125,7 @@ class ClientHandler extends Thread
 		}
 	}
 	
+	// send board ready notification
 	public void ready(String from, String to)
 	{
 		boolean send = false;
@@ -135,22 +147,22 @@ class ClientHandler extends Thread
 	    	inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 	    	outputStream = new PrintStream(clientSocket.getOutputStream());
 	    	String name;
-    		name = "Player"+Integer.toString(++playerValue);
+    		name = "Player"+Integer.toString(++playerValue); // for first connection, P1. for second, P2
     		this.isSetName = true;
 	    	
-	    	outputStream.println("You are " + name);
+	    	outputStream.println("You are " + name); // specify which player the user is
 	    	
     		for (int i = 0; i < 2; i++) 
     		{
     			if (handler[i] != null && handler[i] == this) 
     			{
-    				clientName = name;
+    				clientName = name; // set current name to P1
     				break;
     			}
     		}
     		for (int i = 0; i < 2; i++) 
     		{
-    			if (handler[i] != null && handler[i] != this) 
+    			if (handler[i] != null && handler[i] != this)  // if second player arrives, set up game
     			{
     				if(handler[i].isSetName)
     				{
@@ -160,45 +172,45 @@ class ClientHandler extends Thread
     			}
     		}
     		Boolean sentinel = true;
-	    	while (sentinel) 
+	    	while (sentinel) // always true until broken -- needs fixing
 	    	{
-	    		String line = inputStream.readLine();
+	    		String line = inputStream.readLine(); // read server response
 	    		System.out.println(line);
-	    		if (line.startsWith("|")) 
+	    		if (line.startsWith("|")) // if start with | then predefined term
 	    		{
 	    			String command;
-	    			String[] serverString = line.substring(1).split(" ",2);
+	    			String[] serverString = line.substring(1).split(" ",2); // split string on spaces
 	    			command = serverString[0].trim();
     				if (!command.isEmpty()) 
     				{
     					switch(command)
     					{
-    						case "end":
+    						case "end": // break on end, currently not working
     							break;
-    						case "winner":
+    						case "winner": // send win notification
     							win(name, serverString[1]);
     							break;
-    						case "setup":
+    						case "setup": // set up game 
 	    						setup(name, serverString[1]);
 	    						break;
-	    					case "ready":
+	    					case "ready": // player board now filled with ships
 	    						ready(name, serverString[1]);
 	    						break;	
-    						case "attack":
+    						case "attack": // player has attacked
     							if(serverString.length == 2)
 	    						{
 	    							serverString = serverString[1].split(" ",2);
 	    							attack(name, serverString[0], serverString[1]);
 	    						}
 	    						break;
-	    					case "hit":
+	    					case "hit": // in case of hit
 	    						if(serverString.length == 2)
 	    						{
 	    							serverString = serverString[1].split(" ",2);
 	    							hitResponse(name, serverString[0], serverString[1]);
 	    						}
 	    						break;
-	    					case "miss":
+	    					case "miss": // in case of miss
 	    						if(serverString.length == 2)
 	    						{
 	    							serverString = serverString[1].split(" ",2);
@@ -211,7 +223,7 @@ class ClientHandler extends Thread
     				}
     				else
     				{
-    					this.outputStream.println("Something went wrong");
+    					this.outputStream.println("Something went wrong"); // this should not happen
     				}
 	    		}
 	    		else
