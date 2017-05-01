@@ -1,3 +1,8 @@
+/*
+* This class defines Client side of the code that creates 2 threads for each player
+*/
+
+
 import java.io.PrintStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -9,19 +14,20 @@ import java.lang.InterruptedException;
 public class Client implements Runnable 
 {
 
+	// network related objects
 	public static Socket clientSocket = null;
 	public static PrintStream outputStream = null;
 	public static BufferedReader inputStream = null;
 	public static BufferedReader input = null;
 
-	public static Board myBoard, enemyBoard;
-	public static String inputString;
-	public static String response;
-	public static boolean gameMode = false;
-	public static boolean end = false;
-	public static String enemyPlayer = "";
-	public static boolean inGame = false;
-	public static int playerTurn = 0;
+	public static Board myBoard, enemyBoard; // p1 p2 boards
+	public static String inputString; // string var for user input
+	public static String response; // server response
+	public static boolean gameMode = false; // setup mode or not
+	public static boolean end = false; // game ended or not. main while loop
+	public static String enemyPlayer = ""; // player name, always P2
+	public static boolean inGame = false; // in game or not
+	public static int playerTurn = 0; // toggle between players for turn checking
 	public static final int port = 7654;
 	public static final String hostname = "localhost";
 
@@ -48,35 +54,35 @@ public class Client implements Runnable
 		
 		try 
 		{
-			System.out.println("PREPARE FOR BATTLESHIP");
-			new Thread(new Client()).start();
+			System.out.println("PREPARE FOR BATTLESHIP"); // interaction with player
+			new Thread(new Client()).start(); // start client thread
 			while (!end) 
 			{
-				if(gameMode==false)
+				if(gameMode==false) // if not game mode, waiting for player2, set up game and begin
 				{
 					inputString = input.readLine();
 					
 					gameMode = true;
 					if(enemyPlayer.equals("Player2"))
-						outputStream.println("|setup " + enemyPlayer);
+						outputStream.println("|setup " + enemyPlayer); // start game
 				}
 				else
 				{
-					for(int i=0;i<2;i++)
+					for(int i=0;i<2;i++) // currently number of ships is 2 so run twice
 					{
 						setupBoard();
 					}
 					System.out.println("\n\n\n\n\n");
 					System.out.println("My Board:");
 					System.out.println("");
-					myBoard.printBoard();
+					myBoard.printBoard();	// print board
 					if(playerTurn==0)
 						playerTurn=1;
-					outputStream.println("|ready " + enemyPlayer);
+					outputStream.println("|ready " + enemyPlayer); // once boar set, send ready request
 					System.out.println("Press Enter to begin");
 					input.readLine();
 
-					while(inGame==false)
+					while(inGame==false) // not your turn, wait for other player
 					{
 						System.out.println("Wait!");
 						try
@@ -95,9 +101,9 @@ public class Client implements Runnable
 						int X,Y;
 						if(playerTurn==1) // P1 turn
 						{
-							attack();
+							attack(); // attack
 						}
-						if(playerTurn==2)
+						if(playerTurn==2) // or wait to be attacked
 						{
 							System.out.println("My Board:\n");
 							myBoard.printBoard();
@@ -118,7 +124,8 @@ public class Client implements Runnable
 		
 	  }
 	
-	public static void attack()
+	// get coordinates and attack enemy board
+	public static void attack() 
 	{
 		int X,Y;
 		try
@@ -134,13 +141,15 @@ public class Client implements Runnable
 			System.out.print("Y:");
 			Y = Integer.parseInt(input.readLine());
 			
-			outputStream.println("|attack " + enemyPlayer + " " + (Integer.toString(X)+Integer.toString(Y)));
+			outputStream.println("|attack " + enemyPlayer + " " + (Integer.toString(X)+Integer.toString(Y))); // send server request for attack
 		}
 		catch(IOException e)
 		{
 			System.out.println("Something went wrong");
 		}
 	}
+
+	// get coordinates for each ship to set up on board
 	public static void setupBoard()
 	{
 		int X,Y;
@@ -173,42 +182,43 @@ public class Client implements Runnable
 		}
 	}
 
+	// thread invokes this function
 	  public void run() 
 	  {
 		  try 
 		  {
-			  while ((response = inputStream.readLine()) != null) 
+			  while ((response = inputStream.readLine()) != null) // if getting a response from server
 			  {
-				  if (response.startsWith("Challenge"))
+				  if (response.startsWith("Challenge")) // if this, set up game
 				  {
 					  enemyPlayer = "Player2";
 				  }
-				  if (response.contains("Game On"))
+				  if (response.contains("Game On")) // if this you are P2
 				  {
 					  enemyPlayer = "Player1";
 					  gameMode = true;
 				  }
-				  if (response.contains("Player Ready"))
+				  if (response.contains("Player Ready")) // if ready, start game
 				  {
 					  if(playerTurn==0)
 						  playerTurn=2;
 					  inGame=true;
 				  }
-				  if (response.contains("hit"))
+				  if (response.contains("hit"))	// if this, then you hit enemy ship
 				  {
 					  String[] attributes = response.split(" ",8);
 					  String CoordX = String.valueOf(attributes[7].charAt(0));
 					  String CoordY = String.valueOf(attributes[7].charAt(1));
 					  response="You Hit users ship on Coords " + CoordX + " " + CoordY + "\nPress Enter and wait for attack!";
-					  enemyBoard.markHit(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
+					  enemyBoard.markHit(Integer.parseInt(CoordX), Integer.parseInt(CoordY)); // mark enemy board for attack
 					  enemyBoard.attack(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
 					  System.out.println("\n\n\n\n\n");
 					  System.out.println("Enemy Board:");
 					  System.out.println("");
 					  enemyBoard.printBoard();
-					  playerTurn=2;
+					  playerTurn=2; // toggle turn
 				  }
-				  if (response.contains("miss"))
+				  if (response.contains("miss")) // if this, then you miss enemy ship
 				  {
 					  String[] attributes = response.split(" ",6);
 					  String CoordX = String.valueOf(attributes[5].charAt(0));
@@ -220,9 +230,9 @@ public class Client implements Runnable
 					  System.out.println("Enemy Board:");
 					  System.out.println("");
 					  enemyBoard.printBoard();
-					  playerTurn=2;
-				  }
-				  if (response.startsWith("--- You Win!"))
+					  playerTurn=2; // toggle turn
+				  } 
+				  if (response.startsWith("--- You Win!")) // end of game
 				  {
 					  playerTurn=0;
 					  gameMode=false;
@@ -230,11 +240,11 @@ public class Client implements Runnable
 					  enemyPlayer="";
 					  System.out.println("\n\n\n\n\n");
 				  }
-				  if (response.startsWith("--- Attack from User "))
+				  if (response.startsWith("--- Attack from User ")) // attack enemy 
 				  {
 					  String[] attributes = response.split(" ",8);
-					  String CoordX = String.valueOf(attributes[7].charAt(0));
-					  String CoordY = String.valueOf(attributes[7].charAt(1));
+					  String CoordX = String.valueOf(attributes[7].charAt(0)); // x coord
+					  String CoordY = String.valueOf(attributes[7].charAt(1)); // y coord
 					  boolean isAttack = myBoard.attack(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
 					  if(isAttack)
 					  {
@@ -249,7 +259,7 @@ public class Client implements Runnable
 					  myBoard.printBoard();
 					  response = "--- Attack from User " + enemyPlayer + " on Coordinates " + CoordX + " " + CoordY;
 					  System.out.println(response);
-					  if(myBoard.lost())
+					  if(myBoard.lost()) // you lost, end game
 					  {
 						  response="You Lost!\nPress Enter to leave";
 						  playerTurn=0;
