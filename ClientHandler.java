@@ -7,90 +7,81 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.net.ServerSocket;
 
 class ClientHandler extends Thread 
 {
 	// network related objects
 	private String clientName = null;
-	private BufferedReader inputStream = null;
-	private PrintStream outputStream = null;
+    private PrintStream outputStream = null;
 	private Socket clientSocket = null;
 	private final ClientHandler[] handler;
 	private boolean isSetName = false;
-	public static int playerValue = 0;
+	private static int playerValue = 0;
 	
-	public ClientHandler(Socket clientSocket, ClientHandler[] handler) 
+	public ClientHandler(Socket clientSocket, ClientHandler[] handler)
 	{
 		this.clientSocket = clientSocket;
 	    this.handler = handler;
 	}
 	
 	// send win notification
-	public void win(String from, String to) 
+    private void win(String to)
 	{
-		boolean send = false;
 		for (int i = 0; i < 2; i++) // only two threads, one for each player
 		{
 			if (handler[i].clientName.equals(to)) 
 			{
 			 	handler[i].outputStream.println("--- You Win! Hit enter to leave the game!");
-			 	send = true;
-			  	break;
+                break;
 			}
 		}
 	}
 	
 	// send attack notification
-	public void attack(String from, String to, String Coords)
+    private void attack(String from, String to, String Coords)
 	{
-		boolean send = false;
+
 		
 		for (int i = 0; i < 2; i++) 
 		{
 			if (handler[i].clientName.equals(to)) // check if this player by name
 			{
 			 	handler[i].outputStream.println("--- Attack from User " + from + " on Coordinates " + Coords);
-			 	send = true;
-			  	break;
+                break;
 			}
 		}
 	}
 
 	// send hit enemy ship notification
-	public void hitResponse(String from, String to, String Coords)
+    private void hitResponse(String to, String Coords)
 	{
-		boolean send = false;
-		
+
 		for (int i = 0; i < 2; i++) 
 		{
 			if (handler[i].clientName.equals(to)) 
 			{
 			 	handler[i].outputStream.println("--- You hit users ship on Coordinates " + Coords);
-			 	send = true;
-			  	break;
+                break;
 			}
 		}
 	}
 	
 	// send miss enemy ship notification
-	public void missResponse(String from, String to, String Coords)
+    private void missResponse(String to, String Coords)
 	{
-		boolean send = false;
-		
+
 		for (int i = 0; i < 2; i++) 
 		{
 			if (handler[i].clientName.equals(to)) 
 			{
 			 	handler[i].outputStream.println("--- You miss on Coordinates " + Coords);
-			 	send = true;
-			  	break;
+                break;
 			}
 		}
 	}
 	
 	// send game setup notification
-	public void game(String from, String to)
+    private void game(String from, String to)
 	{
 		boolean send = false;
 		
@@ -104,38 +95,34 @@ class ClientHandler extends Thread
 			  	break;
 			}
 		}
-		if(send == false)
+		if(!send)
 		{
 			this.outputStream.println("--- User " + to + " does not exist!");
 		}
 	}
 	
 	// send game beginning notification
-	public void setup(String from, String to)
+    private void setup(String to)
 	{
-		boolean send = false;
-		for (int i = 0; i < 2; i++) 
+		for (int i = 0; i < 2; i++)
 		{
 			if (handler[i].clientName.equals(to)) 
 			{
 			 	handler[i].outputStream.println("Game On! Press Enter to continue:");
-			 	send = true;
-			  	break;
+                break;
 			}
 		}
 	}
 	
 	// send board ready notification
-	public void ready(String from, String to)
+    private void ready(String to)
 	{
-		boolean send = false;
 		for (int i = 0; i < 2; i++) 
 		{
 			if (handler[i].clientName.equals(to)) 
 			{
 			 	handler[i].outputStream.println("Player Ready");
-			 	send = true;
-			  	break;
+                break;
 			}
 		}
 	}
@@ -144,7 +131,7 @@ class ClientHandler extends Thread
 	{	
 	    try 
 	    {
-	    	inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 	    	outputStream = new PrintStream(clientSocket.getOutputStream());
 	    	String name;
     		name = "Player"+Integer.toString(++playerValue); // for first connection, P1. for second, P2
@@ -186,15 +173,16 @@ class ClientHandler extends Thread
     					switch(command)
     					{
     						case "end": // break on end, currently not working
+                                sentinel = false;
     							break;
     						case "winner": // send win notification
-    							win(name, serverString[1]);
+    							win(serverString[1]);
     							break;
     						case "setup": // set up game 
-	    						setup(name, serverString[1]);
+	    						setup(serverString[1]);
 	    						break;
 	    					case "ready": // player board now filled with ships
-	    						ready(name, serverString[1]);
+	    						ready(serverString[1]);
 	    						break;	
     						case "attack": // player has attacked
     							if(serverString.length == 2)
@@ -207,14 +195,14 @@ class ClientHandler extends Thread
 	    						if(serverString.length == 2)
 	    						{
 	    							serverString = serverString[1].split(" ",2);
-	    							hitResponse(name, serverString[0], serverString[1]);
+	    							hitResponse(serverString[0], serverString[1]);
 	    						}
 	    						break;
 	    					case "miss": // in case of miss
 	    						if(serverString.length == 2)
 	    						{
 	    							serverString = serverString[1].split(" ",2);
-	    							missResponse(name, serverString[0], serverString[1]);
+	    							missResponse(serverString[0], serverString[1]);
 	    						}
 	    						break;
 	    					default:

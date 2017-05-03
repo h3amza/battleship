@@ -2,10 +2,11 @@
 * This class defines the game board and related function
 */
 
-public class Board 
+class Board
 {
-	public char[][] Coords; // game grid
-	private int height, width; // can be used if dynamic grid selected going forward
+	private char[][] Coords; // game grid
+	private final int height;
+    private final int width; // can be used if dynamic grid selected going forward
 	
 	public Board()
 	{
@@ -22,16 +23,13 @@ public class Board
 	}
 	
 	// check if grid empty or not
-	public boolean isEmpty(int x, int y)
+    private boolean isEmpty(int x, int y)
 	{
-		if(Coords[x][y] == '~')
-			return true;
-		else
-			return false;
+        return Coords[x][y] == '~';
 	}
 
 	// given a ship object, check if ship is in bounds or not
-	public boolean isOnBounds(Ship ship) 
+    private boolean isOnBounds(Ship ship)
 	{
 		if(ship.orientation) // if horizontal, add length and check
 		{
@@ -43,10 +41,7 @@ public class Board
 			if((ship.x+ship.length)>5)
 				return false;
 		}
-		if(ship.x>=0 && ship.x<=4 && ship.y>=0 && ship.y<=4)
-			return true;
-		else
-			return false;
+        return ship.x >= 0 && ship.x <= 4 && ship.y >= 0 && ship.y <= 4;
 	}
 
 	// given a ship object, set up ship on board

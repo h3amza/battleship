@@ -2,19 +2,15 @@
 * This class defines Server that starts Client handler threads and communicates responses
 */
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
 
-public class Server 
+class Server
 {
-	public static ServerSocket serverSocket = null;
-	public static Socket clientSocket = null;
-	public static final ClientHandler[] handler = new ClientHandler[2]; // one handler for each player
-	public static final int port = 7654;
+	private static ServerSocket serverSocket = null;
+    private static final ClientHandler[] handler = new ClientHandler[2]; // one handler for each player
+	private static final int port = 7654;
 
 
 	public static void main(String args[]) 
@@ -27,15 +23,15 @@ public class Server
 		} 
 		catch (IOException e) 
 		{
-			System.out.println(e);
+			System.out.println("Something went wrong");
 		}
 
 		while (true) 
 		{
 			try 
 			{
-				clientSocket = serverSocket.accept();
-				int i = 0;
+                Socket clientSocket = serverSocket.accept();
+				int i;
 				for (i = 0; i < 2; i++) 
 				{
 					if (handler[i] == null) 
@@ -47,7 +43,7 @@ public class Server
 			} 
 			catch (IOException e) 
 			{
-				System.out.println(e);
+				System.out.println("Something went wrong");
 			}
 		}
 	}

@@ -5,10 +5,12 @@
 * dynamic ship size
 */
 
-public class Ship 
+class Ship
 {
-	public int length, x, y;
-	public boolean orientation;
+	public final int length;
+	public final int x;
+	public final int y;
+	public final boolean orientation;
 	public Ship(int x, int y, boolean o)
 	{
 		this.x = x;
