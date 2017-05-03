@@ -56,17 +56,28 @@ public class Board
 		if(isOnBounds(ship)) // check if in bounds
 		{
 			int i;
+			char[][] temp = Coords.clone();
+			for(int x = 0; x < temp.length; x++) {
+				Coords[x] = Coords[x].clone();
+			}
 			for(i=0;i<ship.length;i++)
 			{
 				if(ship.orientation)
 				{
-					Coords[ship.x][ship.y + i] = 'O';
+					if(isEmpty(ship.x,ship.y + i))
+						temp[ship.x][ship.y + i] = 'O';
+					else
+						return false;
 				}
 				else
 				{
-					Coords[ship.x + i][ship.y] = 'O';
+					if(isEmpty(ship.x + i, ship.y))
+						temp[ship.x + i][ship.y] = 'O';
+					else
+						return false;
 				}
 			}
+			Coords = temp;
 			return true;	
 		}
 		else

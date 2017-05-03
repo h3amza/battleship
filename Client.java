@@ -154,32 +154,65 @@ public class Client implements Runnable
 	{
 		int X,Y;
 		String Orientation;
-		Ship temp;
+		Ship temp = null;
 		System.out.println("Set up board..");
 		System.out.println("You can set up 2 ships of size 2");
 		System.out.println("~ is water, O is ship, * is missed attack, X is hit attack");
-		System.out.println("Enter X and Y coordinates(0-4)");
-		myBoard.printBoard();
-		try
-		{
-			System.out.println("Give X value:");
-			X = Integer.parseInt(input.readLine());
-			
-			System.out.println("Give Y value:");
-			Y = Integer.parseInt(input.readLine());
-			
-			System.out.println("Do you want the Ship to be horizontal? (y/n)");
-			Orientation = input.readLine();
-			if(Orientation.equals("y"))
-				temp = new Ship(X,Y,true);
-			else
-				temp = new Ship(X,Y,false);
-			myBoard.setShip(temp);
-		}
-		catch(IOException e)
-		{
-			System.out.println("Something went wrong");
-		}
+		while(true) {
+            System.out.println("Enter X and Y coordinates(0-4)");
+            myBoard.printBoard();
+            while (true) {
+                try {
+                    System.out.println("Give X value:");
+                    X = Integer.parseInt(input.readLine());
+
+
+                    System.out.println("Give Y value:");
+                    Y = Integer.parseInt(input.readLine());
+                    if (X < 0 || X > 4) {
+                        System.out.println("Invalid X value, please try again");
+                        continue;
+                    }
+                    if (Y < 0 || Y > 4) {
+                        System.out.println("Invalid Y value, please try again");
+                        continue;
+                    }
+                    break;
+
+                } catch (Exception e) {
+                    System.out.println("Something went wrong,please try again");
+                }
+            }
+
+            while (true) {
+                try {
+                    System.out.println("Do you want the Ship to be horizontal? (y/n)");
+                    Orientation = input.readLine().toLowerCase();
+
+                    switch (Orientation) {
+                        case "y":
+                            temp = new Ship(X, Y, true);
+                            break;
+                        case "n":
+                            temp = new Ship(X, Y, false);
+                            break;
+                        default:
+                            System.out.println("Invalid input please try again\n");
+                            continue;
+                    }
+
+
+                    break;
+                } catch (Exception e) {
+                    System.out.println("Something went wrong,please try again\n");
+                }
+
+            }
+            if(myBoard.setShip(temp))
+                break;
+            else
+                System.out.println("Trying to place ship in spot that is already occupied, please try again");
+        }
 	}
 
 	// thread invokes this function
