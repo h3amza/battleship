@@ -8,7 +8,7 @@ import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;
 
-class ClientHandler extends Thread 
+public class ClientHandler extends Thread
 {
 	// network related objects
 	private String clientName = null;

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.ServerSocket;
 
-class Server
+public class Server
 {
 	private static ServerSocket serverSocket = null;
     private static final ClientHandler[] handler = new ClientHandler[2]; // one handler for each player

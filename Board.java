@@ -2,7 +2,7 @@
 * This class defines the game board and related function
 */
 
-class Board
+public class Board
 {
 	private char[][] Coords; // game grid
 	private final int height;
@@ -46,7 +46,7 @@ class Board
 
 	// given a ship object, set up ship on board
 	// fill grid with O based on ship size and orientation
-	public boolean setShip(Ship ship)
+    public boolean setShip(Ship ship)
 	{
 		if(isOnBounds(ship)) // check if in bounds
 		{
@@ -80,7 +80,7 @@ class Board
 	}
 
 	// update grid value based on hit or miss
-	public boolean attack(int x, int y)
+    public boolean attack(int x, int y)
 	{
 		if(!(Coords[x][y]=='~'))
 		{
@@ -97,7 +97,7 @@ class Board
 	}
 
 	// display board
-	public void printBoard()
+    public void printBoard()
 	{
 		System.out.println(" Y 0 1 2 3 4");
 		System.out.println("X");
@@ -114,19 +114,19 @@ class Board
 
 	// marks enemy's board to be hit
 	// used when enemy board is displayed
-	public void markHit(int X, int Y)
+    public void markHit(int X, int Y)
 	{
 		Coords[X][Y] = 'X';
 	}
 
 	// same as mark hit but for miss
-	public void markMiss(int X, int Y)
+    public void markMiss(int X, int Y)
 	{
 		Coords[X][Y] = '*';
 	}
 	
 	// if no Os then player has lost
-	public boolean lost()
+    public boolean lost()
 	{
 		for(int i=0;i<width;i++)
 		{

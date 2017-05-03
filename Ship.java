@@ -5,7 +5,7 @@
 * dynamic ship size
 */
 
-class Ship
+public class Ship
 {
 	public final int length;
 	public final int x;
