@@ -285,6 +285,7 @@ public class Client implements Runnable
 					  inGame=false;
 					  enemyPlayer="";
 					  System.out.println("\n\n\n\n\n");
+					  outputStream.println("end");
 				  }
 				  if (response.startsWith("--- Attack from User ")) // attack enemy 
 				  {
@@ -312,6 +313,7 @@ public class Client implements Runnable
 						  gameMode=false;
 						  inGame=false;
 						  outputStream.println("|winner " + enemyPlayer);
+						  outputStream.println("end");
 					  }
 					  else
 					  {
@@ -319,6 +321,8 @@ public class Client implements Runnable
 						  playerTurn=1;
 					  }
 				  }
+				  if(response.startsWith("--- End"))
+				  	System.exit(0);
 				  System.out.println(response);
 			  }
 			  end = true;

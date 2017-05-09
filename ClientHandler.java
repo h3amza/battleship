@@ -23,7 +23,14 @@ public class ClientHandler extends Thread
 		this.clientSocket = clientSocket;
 	    this.handler = handler;
 	}
-	
+
+	private void end()
+	{
+		for (int i = 0; i < 2; i++) // only two threads, one for each player
+		{
+			handler[i].outputStream.println("--- Exit");
+		}
+	}
 	// send win notification
     private void win(String to)
 	{
@@ -174,6 +181,7 @@ public class ClientHandler extends Thread
     					{
     						case "end": // break on end, currently not working
                                 sentinel = false;
+    							end();
     							break;
     						case "winner": // send win notification
     							win(serverString[1]);
