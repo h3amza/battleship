@@ -313,7 +313,7 @@ public class Client implements Runnable
 						  gameMode=false;
 						  inGame=false;
 						  outputStream.println("|winner " + enemyPlayer);
-						  outputStream.println("end");
+						  outputStream.println("|end");
 					  }
 					  else
 					  {

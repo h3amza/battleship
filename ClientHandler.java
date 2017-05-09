@@ -28,7 +28,7 @@ public class ClientHandler extends Thread
 	{
 		for (int i = 0; i < 2; i++) // only two threads, one for each player
 		{
-			handler[i].outputStream.println("--- Exit");
+			handler[i].outputStream.println("--- End");
 		}
 	}
 	// send win notification
