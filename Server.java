@@ -24,7 +24,8 @@ public class Server
 		catch (IOException e) 
 		{
 			System.out.println("Something went wrong");
-			return;
+			e.printStackTrace();
+			System.exit(-1);
 		}
 
 		while (true) 
@@ -41,10 +42,12 @@ public class Server
 						break;
 					}
 				}	
-			} 
+			}
 			catch (IOException e) 
 			{
 				System.out.println("Something went wrong");
+				e.printStackTrace();
+				System.exit(-1);
 			}
 		}
 	}

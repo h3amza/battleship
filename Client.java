@@ -330,6 +330,7 @@ public class Client implements Runnable
 		  catch (IOException e) 
 		  {
 			  System.out.println("IOException:  " + e);
+			  System.exit(-1);
 		  }
 	  }
 }

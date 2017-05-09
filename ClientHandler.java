@@ -29,6 +29,7 @@ public class ClientHandler extends Thread
 		for (int i = 0; i < 2; i++) // only two threads, one for each player
 		{
 			handler[i].outputStream.println("--- End");
+			System.exit(0);
 		}
 	}
 	// send win notification
@@ -219,12 +220,12 @@ public class ClientHandler extends Thread
     				}
     				else
     				{
-    					this.outputStream.println("Something went wrong"); // this should not happen
+    					this.outputStream.println("Something went wrong 1"); // this should not happen
     				}
 	    		}
 	    		else
 	    		{
-	    			this.outputStream.println("Something went wrong");
+	    			this.outputStream.println("Something went wrong 2");
 	    		}
 	    	}
 	    	inputStream.close();
@@ -234,6 +235,7 @@ public class ClientHandler extends Thread
 	    catch (IOException e) 
 	    {
 	    	System.out.println("Something went wrong");
+	    	e.printStackTrace();
 	    }
 	}
 }
