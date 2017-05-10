@@ -1,7 +1,8 @@
 /*
 * This class defines Client side of the code that creates 2 threads for each player
+* Instead of creating a separate thread class with data to be passed around upon creation, 
+* the threads are generated for this class. 
 */
-
 
 import java.io.PrintStream;
 import java.io.BufferedReader;
@@ -12,22 +13,23 @@ import java.lang.InterruptedException;
 
 public class Client implements Runnable
 {
-
 	// network related objects
-	private static Socket clientSocket = null;
-	private static PrintStream outputStream = null;
-	private static BufferedReader inputStream = null;
-	private static BufferedReader input = null;
+	public static Socket clientSocket;
+	public static PrintStream outputStream;
+	public static BufferedReader inputStream;
+	public static BufferedReader input;
 
-	private static Board myBoard;
-    private static Board enemyBoard; // p1 p2 boards
-    private static boolean gameMode = false; // setup mode or not
-	private static boolean end = false; // game ended or not. main while loop
-	private static String enemyPlayer = ""; // player name, always P2
-	private static boolean inGame = false; // in game or not
-	private static int playerTurn = 0; // toggle between players for turn checking
-	private static final int port = 7654;
-	private static final String hostname = "localhost";
+	public static Board myBoard;
+    public static Board enemyBoard; // p1 p2 boards
+
+    public static boolean gameMode = false; // setup mode or not
+	public static boolean end = false; // game ended or not. main while loop
+	public static String enemyPlayer = ""; // player name, always P2
+	public static boolean inGame = false; // in game or not
+	public static int playerTurn = 0; // toggle between players for turn checking
+
+	public static final int port = 7654;
+	public static final String hostname = "localhost";
 
 	public static void main(String[] args) 
 	{
@@ -106,8 +108,6 @@ public class Client implements Runnable
 					}
 				}
 			}
-			outputStream.close();
-			inputStream.close();
 			clientSocket.close();
 		} 
 		catch (IOException e) 
@@ -115,10 +115,10 @@ public class Client implements Runnable
 			System.out.println("IOException:  " + e);
 	    }
 		
-	  }
+	}
 	
 	// get coordinates and attack enemy board
-	private static void attack()
+	public static void attack()
 	{
 	    while(true) {
             int X, Y;
@@ -168,7 +168,7 @@ public class Client implements Runnable
 	}
 
 	// get coordinates for each ship to set up on board
-	private static void setupBoard()
+	public static void setupBoard()
 	{
 		int X,Y;
 		String Orientation;
@@ -184,9 +184,9 @@ public class Client implements Runnable
                     System.out.println("Give X value:");
                     X = Integer.parseInt(input.readLine());
 
-
                     System.out.println("Give Y value:");
                     Y = Integer.parseInt(input.readLine());
+                    // check if valid input or in bounds
                     if (X < 0 || X > 4) {
                         System.out.println("Invalid X value, please try again");
                         continue;
@@ -218,8 +218,6 @@ public class Client implements Runnable
                             System.out.println("Invalid input please try again\n");
                             continue;
                     }
-
-
                     break;
                 } catch (Exception e) {
                     System.out.println("Something went wrong,please try again\n");
@@ -233,111 +231,105 @@ public class Client implements Runnable
         }
 	}
 
+	public void printEnemyBoard()
+	{
+		System.out.println("\n\n\n\n\n");
+		System.out.println("Enemy Board:");
+		System.out.println("");
+		enemyBoard.printBoard();
+	}
 	// thread invokes this function
-	  public void run() 
-	  {
-		  try 
-		  {
-              String response;
-              while ((response = inputStream.readLine()) != null) // if getting a response from server
-			  {
-				  if (response.startsWith("Challenge")) // if this, set up game
-				  {
-					  enemyPlayer = "Player2";
-				  }
-				  if (response.contains("Game On")) // if this you are P2
-				  {
-					  enemyPlayer = "Player1";
-					  gameMode = true;
-				  }
-				  if (response.contains("Player Ready")) // if ready, start game
-				  {
-					  if(playerTurn==0)
-						  playerTurn=2;
-					  inGame=true;
-				  }
-				  if (response.contains("hit"))	// if this, then you hit enemy ship
-				  {
-					  String[] attributes = response.split(" ",8);
-					  String CoordX = String.valueOf(attributes[7].charAt(0));
-					  String CoordY = String.valueOf(attributes[7].charAt(1));
-					  response ="You Hit users ship on Coords " + CoordX + " " + CoordY + "\nPress Enter and wait for attack!";
-					  enemyBoard.markHit(Integer.parseInt(CoordX), Integer.parseInt(CoordY)); // mark enemy board for attack
-					  enemyBoard.attack(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
-					  System.out.println("\n\n\n\n\n");
-					  System.out.println("Enemy Board:");
-					  System.out.println("");
-					  enemyBoard.printBoard();
-					  playerTurn=2; // toggle turn
-				  }
-				  if (response.contains("miss")) // if this, then you miss enemy ship
-				  {
-					  String[] attributes = response.split(" ",6);
-					  String CoordX = String.valueOf(attributes[5].charAt(0));
-					  String CoordY = String.valueOf(attributes[5].charAt(1));
-					  response ="You miss! \nPress Enter and wait for attack!";
-					  enemyBoard.markMiss(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
-					  enemyBoard.attack(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
-					  System.out.println("\n\n\n\n\n");
-					  System.out.println("Enemy Board:");
-					  System.out.println("");
-					  enemyBoard.printBoard();
-					  playerTurn=2; // toggle turn
-				  } 
-				  if (response.startsWith("--- You Win!")) // end of game
-				  {
-					  playerTurn=0;
-					  gameMode=false;
-					  inGame=false;
-					  enemyPlayer="";
-					  System.out.println("\n\n\n\n\n");
-					  outputStream.println("end");
-				  }
-				  if (response.startsWith("--- Attack from User ")) // attack enemy 
-				  {
-					  String[] attributes = response.split(" ",8);
-					  String CoordX = String.valueOf(attributes[7].charAt(0)); // x coord
-					  String CoordY = String.valueOf(attributes[7].charAt(1)); // y coord
-					  boolean isAttack = myBoard.attack(Integer.parseInt(CoordX), Integer.parseInt(CoordY));
-					  if(isAttack)
-					  {
-						  outputStream.println("|hit " + enemyPlayer + " " + (CoordX+CoordY));
-					  }
-					  else
-					  {
-						  outputStream.println("|miss " + enemyPlayer + " " + (CoordX+CoordY));
-					  }
-					  System.out.println("\n\n\n\n\n");
-					  System.out.println("My Board:\n");
-					  myBoard.printBoard();
-					  response = "--- Attack from User " + enemyPlayer + " on Coordinates " + CoordX + " " + CoordY;
-					  System.out.println(response);
-					  if(myBoard.lost()) // you lost, end game
-					  {
-						  response ="You Lost!\nPress Enter to leave";
-						  playerTurn=0;
-						  gameMode=false;
-						  inGame=false;
-						  outputStream.println("|winner " + enemyPlayer);
-						  outputStream.println("|end");
-					  }
-					  else
-					  {
-						  response ="Hit Enter to Attack!";
-						  playerTurn=1;
-					  }
-				  }
-				  if(response.startsWith("--- End"))
-				  	System.exit(0);
-				  System.out.println(response);
-			  }
-			  end = true;
-		  } 
-		  catch (IOException e) 
-		  {
-			  System.out.println("IOException:  " + e);
-			  System.exit(-1);
-		  }
+	public void run() 
+	{
+	  	try 
+	  	{
+	      	String response;
+	      	while ((response = inputStream.readLine()) != null) // if getting a response from server
+		  	{
+			  	if (response.startsWith("Challenge")) // if this, set up game
+			  	{
+				  	enemyPlayer = "Player2";
+			  	}
+			  	if (response.contains("Game On")) // if this you are P2
+			  	{
+				  	enemyPlayer = "Player1";
+				  	gameMode = true;
+			  	}
+			  	if (response.contains("Player Ready")) // if ready, start game
+			  	{
+				  	if(playerTurn==0)
+					  	playerTurn=2; // both players now connected
+				  	inGame=true;
+			  	}
+			  	if (response.contains("hit"))	// if this, then you hit enemy ship
+			  	{
+				  	String[] responseArray = response.split(" ");
+				  	int x = Character.getNumericValue(responseArray[5].charAt(0));
+				  	int y = Character.getNumericValue(responseArray[5].charAt(1));
+				  	response ="You hit ship on coordinates " + responseArray[5].charAt(0) + " " +responseArray[5].charAt(1) + "\nPress Enter and wait for attack!";
+				  	enemyBoard.markHit(x, y); // mark enemy board for attack
+				  	enemyBoard.attack(x, y);
+				  	printEnemyBoard();
+				  	playerTurn=2; // toggle turn
+			  	}
+			  	if (response.contains("miss")) // if this, then you miss enemy ship
+			  	{
+				  	String[] responseArray = response.split(" ");
+				  	int x = Character.getNumericValue(responseArray[4].charAt(0));
+				  	int y = Character.getNumericValue(responseArray[4].charAt(1));
+				  	response ="You missed! \nPress Enter and wait for attack!";
+				  	enemyBoard.markMiss(x,y);
+				  	enemyBoard.attack(x,y);
+				  	printEnemyBoard();
+				  	playerTurn=2; // toggle turn
+			  	} 
+			  	if (response.contains("You Win!")) // end of game
+			  	{
+				  	System.out.println("\n\n\n\n\n");
+				  	outputStream.println("end");
+			  	}
+			  	if (response.contains("Attack from")) // attack enemy 
+			  	{
+				  	String[] responseArray = response.split(" ");
+				  	int x = Character.getNumericValue(responseArray[5].charAt(0)); // x coord
+				  	int y = Character.getNumericValue(responseArray[5].charAt(1)); // y coord
+				  	boolean isAttack = myBoard.attack(x, y);
+				  	if(isAttack)
+				  	{
+					  	outputStream.println("|hit " + enemyPlayer + " " + responseArray[5].charAt(0) + responseArray[5].charAt(1));
+				  	}
+				  	else
+				  	{
+					  	outputStream.println("|miss " + enemyPlayer + " " + responseArray[5].charAt(0) + responseArray[5].charAt(1));
+				  	}
+				  	System.out.println("\n\n\n\n\n");
+				  	System.out.println("My Board:\n");
+				  	myBoard.printBoard();
+				  	response = "Attack from " + enemyPlayer + " on coordinates " + responseArray[5].charAt(0) + " " + responseArray[5].charAt(1);
+				  	System.out.println(response);
+				  	if(myBoard.lost()) // you lost, end game
+				  	{
+					  	response ="You Lost!";
+					  	outputStream.println("|winner " + enemyPlayer);
+					  	outputStream.println("|end");
+				  	}
+				  	else
+				  	{
+					  	response ="Hit Enter to Attack!";
+					  	playerTurn=1;
+				  	}
+			  	}
+			  	if(response.contains("End"))
+			  		System.exit(0);
+			  	System.out.println(response);
+		  	}
+		  	end = true;
+	  	} 
+	  	catch (IOException e) 
+	  	{
+		  	System.out.println("IOException:  " + e);
+		  	System.exit(-1);
+	  	}
 
-	  }
+	}
 }

@@ -8,9 +8,9 @@ import java.net.ServerSocket;
 
 public class Server
 {
-	private static ServerSocket serverSocket = null;
-    private static final ClientHandler[] handler = new ClientHandler[2]; // one handler for each player
-	private static final int port = 7654;
+	public static ServerSocket serverSocket;
+    public static final ClientHandler[] handler = new ClientHandler[2]; // one handler for each player
+	public static final int port = 7654;
 
 
 	public static void main(String args[]) 
