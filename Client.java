@@ -135,6 +135,7 @@ public class Client implements Runnable
                         System.out.println("X value provided is outside bounds of board, please try again");
                         continue;
                     }
+
                     break;
                 }
 
@@ -148,6 +149,11 @@ public class Client implements Runnable
                     break;
                 }
 
+                if(!enemyBoard.isEmpty(X,Y))
+				{
+					System.out.println("You have already attacked that square, please try again");
+					continue;
+				}
 
                 outputStream.println("|attack " + enemyPlayer + " " + (Integer.toString(X) + Integer.toString(Y))); // send server request for attack
                 break;
@@ -332,5 +338,6 @@ public class Client implements Runnable
 			  System.out.println("IOException:  " + e);
 			  System.exit(-1);
 		  }
+
 	  }
 }

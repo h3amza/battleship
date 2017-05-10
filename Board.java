@@ -23,7 +23,7 @@ public class Board
 	}
 	
 	// check if grid empty or not
-    private boolean isEmpty(int x, int y)
+    public boolean isEmpty(int x, int y)
 	{
         return Coords[x][y] == '~';
 	}
